@@ -5,4 +5,4 @@ app.include_router(auth.router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello, World!"}
+    return {"message": "Hello to EduNotes API!"}
