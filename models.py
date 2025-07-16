@@ -26,7 +26,7 @@ class Users(Base):
 
     # TODO
 
-class Organization_Users(Base):
+class OrganizationUsers(Base):
     __tablename__ = "organization_users"
 
     # TODO
