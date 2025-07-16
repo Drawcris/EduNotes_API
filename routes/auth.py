@@ -13,4 +13,6 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
-# TODO
+@router.get("/")
+def read_root():
+    return {"message": "hi"}
