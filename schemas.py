@@ -1,5 +1,7 @@
 from pydantic import BaseModel
+from datetime import datetime
 
+# User schemas
 class CreateUserRequest(BaseModel):
     username: str
     email: str
@@ -21,6 +23,23 @@ class UpdateUserRequest(BaseModel):
     last_name: str | None = None
     password: str | None = None
 
+
+# Authentication schemas
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+# Organization schemas
+class ReadOrganizationResponse(BaseModel):
+    organization_id: int
+    organization_name: str
+    created_at: datetime
+    updated_at: datetime | None = None
+
+class CreateOrganizationRequest(BaseModel):
+    organization_name: str
+
+class UpdateOrganizationRequest(BaseModel):
+    organization_name: str | None = None
+

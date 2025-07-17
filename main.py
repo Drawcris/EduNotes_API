@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from routes import auth, users
+from routes import auth, users, organizations
 from sqlalchemy.orm import Session
 from typing import Annotated
 from routes.auth import get_current_user
@@ -9,6 +9,7 @@ from database import get_db
 app = FastAPI()
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(organizations.router)
 
 
 @app.get("/")
