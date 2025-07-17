@@ -30,6 +30,14 @@ def read_root():
                 "/users/",
                 "/users/{user_id}"
             ]
+        },
+        "organizations": {
+            "description": "Organization management routes",
+            "methods": ["GET", "POST", "DELETE", "PUT"],
+            "endpoints": [
+                "/organizations/",
+                "/organizations/{organization_id}"
+            ]
         }
     }
     return routes
