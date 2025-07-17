@@ -1,5 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from routes import auth, users
+from sqlalchemy.orm import Session
+from typing import Annotated
+from routes.auth import get_current_user
+from database import get_db
+
+
 app = FastAPI()
 app.include_router(auth.router)
 app.include_router(users.router)
@@ -18,7 +24,7 @@ def read_root():
         },
         "users": {
             "description": "User management routes",
-            "methods": ["GET", "DELETE"],
+            "methods": ["GET", "DELETE", "PUT"],
             "endpoints": [
                 "/users/",
                 "/users/{user_id}"
@@ -26,3 +32,4 @@ def read_root():
         }
     }
     return routes
+

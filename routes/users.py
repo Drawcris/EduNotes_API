@@ -3,6 +3,7 @@ from schemas import ReadUsersResponse, UpdateUserRequest
 from database import db_dependency
 from models import User
 from passlib.context import CryptContext
+from routes.auth import user_dependency
 
 router = APIRouter(
     prefix="/users",
@@ -27,7 +28,7 @@ async def read_user(user_id: int, db: db_dependency):
     return user
 
 @router.delete("/{user_id}")
-async def delete_user(user_id: int, db: db_dependency):
+async def delete_user(user: user_dependency, user_id: int, db: db_dependency):
     user_to_delete = db.query(User).filter(User.user_id == user_id).first()
     if not user_to_delete:
         raise HTTPException(status_code=404, detail="User not found")

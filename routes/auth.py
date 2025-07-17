@@ -19,6 +19,7 @@ router = APIRouter(
 
 load_dotenv()
 
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
@@ -33,6 +34,11 @@ async def create_user(db: db_dependency,
                 password_hash=bcrypt_context.hash(create_user_request.password),
                 first_name=create_user_request.first_name,
                 last_name=create_user_request.last_name)
+    existing_user = db.query(User).filter(or_(User.username == create_user_request.username,
+                                          User.email == create_user_request.email)).first()
+    if existing_user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Username or email already exists")
     db.add(user_model)
     db.commit()
     db.refresh(user_model)
@@ -62,3 +68,18 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
     encode.update({'exp': int(expires.timestamp())})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        user_id: int = payload.get("user_id")
+        if username is None or user_id is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail="could not validate credentials")
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="could not validate credentials")
+
+    return {"username": username, "user_id": user_id}
+
+user_dependency = Annotated[dict, Depends(get_current_user)]
