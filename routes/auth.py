@@ -4,8 +4,8 @@ from passlib.context import CryptContext
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
-from typing import Annotated, List
-from schemas import CreateUserRequest, ReadUsersResponse, Token
+from typing import Annotated
+from schemas import CreateUserRequest, Token
 from starlette import status
 from database import db_dependency
 from models import User
