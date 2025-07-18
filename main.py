@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.staticfiles import StaticFiles
-from routes import auth, users, organizations, channels, topics
+from routes import auth, users, organizations, channels, topics, notes
 from sqlalchemy.orm import Session
 from typing import Annotated
 from routes.auth import get_current_user
@@ -15,6 +15,8 @@ app.include_router(organizations.router)
 app.include_router(channels.router)
 
 app.include_router(topics.router)
+
+app.include_router(notes.router)
 
 app.mount("/media", StaticFiles(directory="media"), name="media")
 
