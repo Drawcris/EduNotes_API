@@ -9,7 +9,7 @@ import os
 
 router = APIRouter(
     prefix="/users",
-    tags=["users"]
+    tags=["users"],
 )
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
