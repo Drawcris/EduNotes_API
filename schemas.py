@@ -86,3 +86,6 @@ class UpdateTopicRequest(BaseModel):
     topic_name: str | None = None
     channel_id: int | None = None
     organization_id: int | None = None
+
+# Note schemas
+
