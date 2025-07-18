@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.staticfiles import StaticFiles
 from routes import auth, users, organizations
 from sqlalchemy.orm import Session
 from typing import Annotated
@@ -10,6 +11,8 @@ app = FastAPI()
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(organizations.router)
+
+app.mount("/media", StaticFiles(directory="media"), name="media")
 
 
 @app.get("/")
@@ -29,6 +32,9 @@ def read_root():
             "endpoints": [
                 "/users/",
                 "/users/{user_id}"
+                "/users/{user_id}/avatar",
+                "/users/{user_id}/increase_score",
+                "/users/{user_id}/decrease_score"
             ]
         },
         "organizations": {

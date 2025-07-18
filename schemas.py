@@ -9,6 +9,7 @@ class CreateUserRequest(BaseModel):
     first_name: str
     last_name: str
 
+
 class ReadUsersResponse(BaseModel):
     user_id : int
     username: str
@@ -16,6 +17,7 @@ class ReadUsersResponse(BaseModel):
     first_name: str
     last_name: str
     score: int
+    avatar_url: str | None = None
 
 class UpdateUserRequest(BaseModel):
     username: str | None = None

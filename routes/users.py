@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException, status, Form, Depends
+from fastapi import APIRouter, HTTPException, status, Form, Depends, File, UploadFile
 from schemas import ReadUsersResponse, UpdateUserRequest
 from database import db_dependency
 from models import User
 from passlib.context import CryptContext
 from routes.auth import user_dependency
+from uuid import uuid4
+import os
 
 router = APIRouter(
     prefix="/users",
@@ -59,6 +61,20 @@ async def update_user(
     db.refresh(user_to_update)
     return {"message": f"User {user_to_update.username} updated successfully"}
 
+@router.put("/{user_id}/avatar")
+async def update_user_avatar(db: db_dependency, user_id: int, file: UploadFile = File(...)):
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    ext = file.filename.split(".")[-1]
+    filename = f"{uuid4()}.{ext}"
+    file_path = os.path.join("media", "avatars", filename)
+    with open(file_path, "wb") as buffer:
+        buffer.write(await file.read())
+    user.avatar_url = f"/media/avatars/{filename}"
+    db.commit()
+    db.refresh(user)
+    return {"message": f"Avatar for user {user.username} updated successfully", "avatar_url": user.avatar_url}
 
 @router.post("/{user_id}/increase_score")
 async def increase_score(user_id: int, db: db_dependency):
@@ -79,3 +95,4 @@ async def decrease_score(user_id: int, db: db_dependency):
     db.commit()
     db.refresh(user)
     return {"message": f"Score for user {user.username} decreased successfully", "new_score": user.score}
+
