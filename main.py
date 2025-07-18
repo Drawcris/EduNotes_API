@@ -50,7 +50,23 @@ def read_root():
                 "/organizations/",
                 "/organizations/{organization_id}"
             ]
-        }
+        },
+        "channels": {
+            "description": "Channel management routes",
+            "methods": ["GET", "POST", "DELETE", "PUT"],
+            "endpoints": [
+                "/channels/",
+                "/channels/{channel_id}",
+            ]
+        },
+        "topics": {
+            "description": "Topic management routes",
+            "methods": ["GET", "POST", "DELETE", "PUT"],
+            "endpoints": [
+                "/topics/",
+                "/topics/{topic_id}",
+            ]
+        },
 
     }
     return routes
