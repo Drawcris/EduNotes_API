@@ -26,6 +26,9 @@ class UpdateUserRequest(BaseModel):
     last_name: str | None = None
     password: str | None = None
 
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
 
 # Authentication schemas
 class Token(BaseModel):

@@ -61,6 +61,19 @@ async def update_user(
     db.refresh(user_to_update)
     return {"message": f"User {user_to_update.username} updated successfully"}
 
+@router.put("/{user_id}/change_password")
+async def change_password(db: db_dependency, user_id: int,
+                          old_password: str = Form(...), new_password: str = Form(...)):
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not bcrypt_context.verify(old_password, user.password_hash):
+        raise HTTPException(status_code=400, detail="Old password is incorrect")
+    user.password_hash = bcrypt_context.hash(new_password)
+    db.commit()
+    db.refresh(user)
+    return {"message": f"Password for user {user.username} changed successfully"}
+
 @router.put("/{user_id}/avatar")
 async def update_user_avatar(db: db_dependency, user_id: int, file: UploadFile = File(...)):
     user = db.query(User).filter(User.user_id == user_id).first()
