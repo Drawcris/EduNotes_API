@@ -64,17 +64,4 @@ async def update_channel(channel_id: int, channel: CreateChannelRequest, db: db_
     db.commit()
     return {"message": f"Channel {existing_channel.channel_name} updated successfully"}
 
-@router.put("/{channel_id}/")
-async def update_channel_name(channel_id: int, channel: UpdateChannelRequest, db: db_dependency):
-    existing_channel = db.query(Channel).filter(Channel.channel_id == channel_id).first()
-    old_name = existing_channel.channel_name
-    if not existing_channel:
-        raise HTTPException(status_code=404, detail="Channel not found")
-
-    if channel.channel_name:
-        existing_channel.channel_name = channel.channel_name
-
-    db.commit()
-    db.refresh(existing_channel)
-    return {"message": f"Channel {old_name} updated to {existing_channel.channel_name} successfully"}
 
