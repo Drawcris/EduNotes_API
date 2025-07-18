@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.staticfiles import StaticFiles
-from routes import auth, users, organizations, channels, topics, notes
+from routes import auth, users, organizations, channels, topics, notes, organization_user
 from sqlalchemy.orm import Session
 from typing import Annotated
 from routes.auth import get_current_user
@@ -11,12 +11,10 @@ app = FastAPI()
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(organizations.router)
-
 app.include_router(channels.router)
-
 app.include_router(topics.router)
-
 app.include_router(notes.router)
+app.include_router(organization_user.router)
 
 app.mount("/media", StaticFiles(directory="media"), name="media")
 
@@ -67,6 +65,14 @@ def read_root():
                 "/topics/{topic_id}",
             ]
         },
+        "notes": {
+            "description": "Note management routes",
+            "methods": ["GET", "POST", "DELETE"],
+            "endpoints": [
+                "/notes/",
+                "/notes/{note_id}",
+            ]
+        }
 
     }
     return routes

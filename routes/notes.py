@@ -3,6 +3,7 @@ from models import Note, NoteContentTypeEnum
 from database import db_dependency
 from schemas import ReadNoteResponse, CreateNoteRequest
 from uuid import uuid4
+from routes.auth import user_dependency
 import os
 
 
@@ -27,10 +28,10 @@ async def read_notes(db: db_dependency, note_id: int):
 
 @router.post("/")
 async def create_note(
+    user: user_dependency,
     title: str = Form(...),
     topic_id: int = Form(...),
     organization_id: int = Form(...),
-    user_id: int = Form(...),
     content_type: NoteContentTypeEnum = Form(...),
     content: str | None = Form(None),
     image: UploadFile | None = File(None),
@@ -51,7 +52,7 @@ async def create_note(
         title=title,
         topic_id=topic_id,
         organization_id=organization_id,
-        user_id=user_id,
+        user_id=user["user_id"],
         content_type=content_type,
         content=content,
         image_url=image_url

@@ -112,3 +112,12 @@ class CreateNoteRequest(BaseModel):
     content: str | None = None
     image_url: str | None = None
 
+
+# Organization User schemas
+class ReadOrganizationUserResponse(BaseModel):
+    organization_id: int
+    user_id: int
+    role: str
+    updated_at: datetime | None = None
+
+

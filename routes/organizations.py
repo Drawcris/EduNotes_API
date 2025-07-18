@@ -3,6 +3,7 @@ from models import Organization
 from database import db_dependency
 from schemas import ReadOrganizationResponse, CreateOrganizationRequest, UpdateOrganizationRequest
 from datetime import datetime, UTC
+from routes.auth import user_dependency
 
 router = APIRouter(
     prefix="/organizations",
@@ -24,7 +25,7 @@ async def read_organization(organization_id: int, db: db_dependency):
     return organization
 
 @router.post("/")
-async def create_organization(db: db_dependency, organization: CreateOrganizationRequest):
+async def create_organization(user: user_dependency, db: db_dependency, organization: CreateOrganizationRequest):
     existing_organization = (db.query(Organization).
                              filter(Organization.organization_name == organization.organization_name).first())
     if existing_organization:
@@ -34,6 +35,16 @@ async def create_organization(db: db_dependency, organization: CreateOrganizatio
     db.add(new_organization)
     db.commit()
     db.refresh(new_organization)
+
+    from models import OrganizationUser, UserRoleEnum
+    user_id = user["user_id"]
+    owner_user = OrganizationUser(
+        organization_id=new_organization.organization_id,
+        user_id=user_id,
+        role=UserRoleEnum.owner
+    )
+    db.add(owner_user)
+    db.commit()
     return {"message": f"Organization {organization.organization_name} created successfully",}
 
 @router.delete("/{organization_id}")
