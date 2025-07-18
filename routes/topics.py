@@ -17,9 +17,9 @@ async def read_topics(db: db_dependency):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No topics found")
     return [topic for topic in topics]
 
-@router.get("/{topic_id}", response_model=list[ReadTopicResponse])
+@router.get("/{topic_id}", response_model=ReadTopicResponse)
 async def read_topics(db: db_dependency, topic_id: int):
-    topic = db.query(Topic).all()
+    topic = db.query(Topic).filter(Topic.topic_id == topic_id).first()
     if not topic:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No topic found")
     return topic
