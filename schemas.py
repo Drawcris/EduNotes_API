@@ -15,6 +15,7 @@ class ReadUsersResponse(BaseModel):
     email: str
     first_name: str
     last_name: str
+    score: int
 
 class UpdateUserRequest(BaseModel):
     username: str | None = None

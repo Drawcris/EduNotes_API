@@ -58,3 +58,24 @@ async def update_user(
     db.commit()
     db.refresh(user_to_update)
     return {"message": f"User {user_to_update.username} updated successfully"}
+
+
+@router.post("/{user_id}/increase_score")
+async def increase_score(user_id: int, db: db_dependency):
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.score += 1
+    db.commit()
+    db.refresh(user)
+    return {"message": f"Score for user {user.username} increased successfully", "new_score": user.score}
+
+@router.post("/{user_id}/decrease_score")
+async def decrease_score(user_id: int, db: db_dependency):
+    user = db.query(User).filter(User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.score -= 1
+    db.commit()
+    db.refresh(user)
+    return {"message": f"Score for user {user.username} decreased successfully", "new_score": user.score}
