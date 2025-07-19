@@ -20,7 +20,7 @@ async def read_notes(db: db_dependency):
     return [note for note in notes]
 
 @router.get("/{note_id}", response_model=ReadNoteResponse)
-async def read_notes(db: db_dependency, note_id: int):
+async def read_note(db: db_dependency, note_id: int):
     note = db.query(Note).filter_by(id=note_id).first()
     if not note:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No notes found")
