@@ -1,14 +1,27 @@
 from fastapi import APIRouter, HTTPException, status
-from models import Organization
+from models.organization import Organization
 from database import db_dependency
-from schemas import ReadOrganizationResponse, CreateOrganizationRequest, UpdateOrganizationRequest
+from schemas.organization import ReadOrganizationResponse, CreateOrganizationRequest, UpdateOrganizationRequest
 from datetime import datetime, UTC
-from routes.auth import user_dependency
+from services.auth_serivce import user_dependency
+from models.organization_user import OrganizationUser, UserRoleEnum
 
 router = APIRouter(
     prefix="/organizations",
     tags=["organizations"],
 )
+
+@router.get("/my")
+async def read_my_organizations(user: user_dependency, db: db_dependency):
+    user_id = user["user_id"]
+    organizations = (db.query(Organization).
+                     join(OrganizationUser).
+                     filter(OrganizationUser.user_id == user_id).all())
+    if not organizations:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No organizations found for this user")
+    return [organization for organization in organizations]
+
+# CRUD
 
 @router.get("/", response_model=list[ReadOrganizationResponse])
 async def read_organizations(db: db_dependency):
@@ -36,7 +49,6 @@ async def create_organization(user: user_dependency, db: db_dependency, organiza
     db.commit()
     db.refresh(new_organization)
 
-    from models import OrganizationUser, UserRoleEnum
     user_id = user["user_id"]
     owner_user = OrganizationUser(
         organization_id=new_organization.organization_id,
@@ -71,7 +83,4 @@ async def update_organization(db: db_dependency, organization_id: int, organizat
     db.commit()
     db.refresh(existing_organization)
     return {"message": f"Organization {existing_organization.organization_name} updated successfully"}
-
-
-
 

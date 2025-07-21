@@ -1,12 +1,23 @@
 from fastapi import APIRouter, HTTPException, status
 from database import db_dependency
-from models import Channel, Organization
-from schemas import ReadChannelResponse, CreateChannelRequest, UpdateChannelRequest
+from models.channel import Channel
+from models.organization import Organization
+from schemas.channel import ReadChannelResponse, CreateChannelRequest, UpdateChannelRequest
 
 router = APIRouter(
     prefix="/channels",
     tags=["channels"],
 )
+
+@router.get("/channels_in_orgazation")
+async def read_channels_in_organization(organization_id: int, db: db_dependency):
+    channels = db.query(Channel).filter(Channel.organization_id == organization_id).all()
+    if not channels:
+        raise HTTPException(status_code=404, detail="No channels found in this organization")
+    return [channel for channel in channels]
+
+
+# CRUD
 
 @router.get("/", response_model=list[ReadChannelResponse])
 async def read_channels(db: db_dependency):
@@ -63,5 +74,3 @@ async def update_channel(channel_id: int, channel: CreateChannelRequest, db: db_
 
     db.commit()
     return {"message": f"Channel {existing_channel.channel_name} updated successfully"}
-
-

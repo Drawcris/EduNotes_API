@@ -1,14 +1,24 @@
 from fastapi import APIRouter, HTTPException, status
-from models import Channel, Topic, Organization
+from models.topic import Topic
+from models.organization import Organization
+from models.channel import Channel
 from database import db_dependency
-from schemas import ReadTopicResponse, CreateTopicRequest, UpdateTopicRequest
-from models import Organization
+from schemas.topic import ReadTopicResponse, CreateTopicRequest, UpdateTopicRequest
 from datetime import datetime, UTC
 
 router = APIRouter(
     prefix="/topics",
     tags=["topics"],
 )
+
+@router.get("/topics_in_channel")
+async def read_topics_in_channel(channel_id: int, db: db_dependency):
+    topics = db.query(Topic).filter(Topic.channel_id == channel_id).all()
+    if not topics:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No topics found in this channel")
+    return [topic for topic in topics]
+
+# CRUD
 
 @router.get("/", response_model=list[ReadTopicResponse])
 async def read_topics(db: db_dependency):
@@ -18,7 +28,7 @@ async def read_topics(db: db_dependency):
     return [topic for topic in topics]
 
 @router.get("/{topic_id}", response_model=ReadTopicResponse)
-async def read_topics(db: db_dependency, topic_id: int):
+async def read_topic(db: db_dependency, topic_id: int):
     topic = db.query(Topic).filter(Topic.topic_id == topic_id).first()
     if not topic:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No topic found")
