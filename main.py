@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends
 from fastapi.staticfiles import StaticFiles
-from routes import auth, users, organizations, channels, topics, notes, organization_user
+from routers import (auth, users, organizations, channels, topics, notes, organization_user, organization_invitations,
+                     ranking)
 from sqlalchemy.orm import Session
 from typing import Annotated
-from routes.auth import get_current_user
 from database import get_db
 
 
@@ -15,6 +15,8 @@ app.include_router(channels.router)
 app.include_router(topics.router)
 app.include_router(notes.router)
 app.include_router(organization_user.router)
+app.include_router(organization_invitations.router)
+app.include_router(ranking.router)
 
 app.mount("/media", StaticFiles(directory="media"), name="media")
 
@@ -23,7 +25,7 @@ app.mount("/media", StaticFiles(directory="media"), name="media")
 def read_root():
     routes = {
         "auth": {
-            "description": "Authentication routes",
+            "description": "Authentication routers",
             "methods": ["POST"],
             "endpoints": [
                 "/auth/login",
@@ -31,7 +33,7 @@ def read_root():
             ]
         },
         "users": {
-            "description": "User management routes",
+            "description": "User management routers",
             "methods": ["GET", "DELETE", "PUT"],
             "endpoints": [
                 "/users/",
@@ -42,7 +44,7 @@ def read_root():
             ]
         },
         "organizations": {
-            "description": "Organization management routes",
+            "description": "Organization management routers",
             "methods": ["GET", "POST", "DELETE", "PUT"],
             "endpoints": [
                 "/organizations/",
@@ -50,27 +52,42 @@ def read_root():
             ]
         },
         "channels": {
-            "description": "Channel management routes",
+            "description": "Channel management routers",
             "methods": ["GET", "POST", "DELETE", "PUT"],
             "endpoints": [
                 "/channels/",
                 "/channels/{channel_id}",
+                "/channels/channels_in_organization"
             ]
         },
         "topics": {
-            "description": "Topic management routes",
+            "description": "Topic management routers",
             "methods": ["GET", "POST", "DELETE", "PUT"],
             "endpoints": [
                 "/topics/",
                 "/topics/{topic_id}",
+                "/topics/topics_in_channel"
             ]
         },
         "notes": {
-            "description": "Note management routes",
+            "description": "Note management routers",
             "methods": ["GET", "POST", "DELETE"],
             "endpoints": [
                 "/notes/",
                 "/notes/{note_id}",
+                "/notes/notes_in_topic"
+            ]
+        },
+        "organization_user": {
+            "description": "Organization user management routers",
+            "methods": ["POST", "DELETE", "GET", "PUT"],
+            "endpoints": [
+                "/organization_user/",
+                "/organization_user/me",
+                "/organization_user/{organization_user_id}",
+                "/organization_user/{organization_user_id}/role",
+                "/organization_user/invite",
+                "/organization_user/RemoveUserFromOrganization",
             ]
         }
 

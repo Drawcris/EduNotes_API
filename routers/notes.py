@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, UploadFile, File, Form
-from models import Note, NoteContentTypeEnum
+from models.note import Note, NoteContentTypeEnum
 from database import db_dependency
-from schemas import ReadNoteResponse, CreateNoteRequest
+from schemas.note import ReadNoteResponse, CreateNoteRequest
 from uuid import uuid4
-from routes.auth import user_dependency
+from services.auth_serivce import user_dependency
 import os
 
 
@@ -11,6 +11,21 @@ router = APIRouter(
     prefix="/notes",
     tags=["notes"],
 )
+@router.get("/my")
+async def read_my_notes(user: user_dependency, db: db_dependency):
+    notes = db.query(Note).filter(Note.user_id == user["user_id"]).all()
+    if not notes:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No notes found for this user")
+    return [note for note in notes]
+@router.get("/notes_in_topic")
+async def read_notes_in_topic(topic_id: int, db: db_dependency):
+    notes = db.query(Note).filter(Note.topic_id == topic_id).all()
+    if not notes:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No notes found in this topic")
+    return [note for note in notes]
+
+
+# CRUD
 
 @router.get("/", response_model=list[ReadNoteResponse])
 async def read_notes(db: db_dependency):
@@ -71,5 +86,3 @@ async def delete_note(db: db_dependency, note_id: int):
     db.delete(note)
     db.commit()
     return {"message": f"Note with ID {note_id} deleted successfully"}
-
-
