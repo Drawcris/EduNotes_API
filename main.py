@@ -1,11 +1,7 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from routers import (auth, users, organizations, channels, topics, notes, organization_user, organization_invitations,
                      ranking)
-from sqlalchemy.orm import Session
-from typing import Annotated
-from database import get_db
-
 
 app = FastAPI()
 app.include_router(auth.router)
