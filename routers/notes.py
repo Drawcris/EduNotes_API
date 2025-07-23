@@ -1,7 +1,10 @@
 from fastapi import APIRouter, HTTPException, status, UploadFile, File, Form
 from models.note import Note, NoteContentTypeEnum
+from models.user import User
+from models.note_like import NoteLike, LikeTypeEnum
 from database import db_dependency
 from schemas.note import ReadNoteResponse, CreateNoteRequest
+from services.rank_service import get_rank_for_score
 from uuid import uuid4
 from services.auth_serivce import user_dependency
 import os
@@ -24,7 +27,43 @@ async def read_notes_in_topic(topic_id: int, db: db_dependency):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No notes found in this topic")
     return [note for note in notes]
 
+@router.post("/give_like")
+async def give_like(note_id: int, user: user_dependency, db: db_dependency):
+    existing = db.query(NoteLike).filter_by(note_id=note_id, user_id=user["user_id"]).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="You have already like/disliked this note")
+    note = db.query(Note).filter(Note.note_id == note_id).first()
+    if not note:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note does not exist")
+    note.likes += 1
+    db.add(NoteLike(note_id=note_id, user_id=user["user_id"], type=LikeTypeEnum.like))
+    db.commit()
+    db.refresh(note)
+    author = db.query(User).filter(User.user_id == note.user_id).first()
+    author.score += 1
+    author.rank = get_rank_for_score(author.score)
+    db.commit()
+    db.refresh(author)
+    return {"message": f"Note {note_id} have been liked", "likes": note.likes}
 
+@router.post("/give_dislike")
+async def give_dislike(note_id: int, user: user_dependency, db: db_dependency):
+    existing = db.query(NoteLike).filter_by(note_id=note_id, user_id=user["user_id"]).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="You have already like/disliked this note")
+    note = db.query(Note).filter(Note.note_id == note_id).first()
+    if not note:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note does not exist")
+    note.likes -= 1
+    db.add(NoteLike(note_id=note_id, user_id=user["user_id"], type=LikeTypeEnum.dislike))
+    db.commit()
+    db.refresh(note)
+    author = db.query(User).filter(User.user_id == note.user_id).first()
+    author.score -= 1
+    author.rank = get_rank_for_score(author.score)
+    db.commit()
+    db.refresh(author)
+    return {"message": f"Note {note_id} have been disliked", "likes": note.likes}
 # CRUD
 
 @router.get("/", response_model=list[ReadNoteResponse])

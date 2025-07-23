@@ -10,6 +10,7 @@ class ReadNoteResponse(BaseModel):
     content_type: str
     content: str | None = None
     image_url: str | None = None
+    likes: int
     created_at: datetime
     updated_at: datetime | None = None
 

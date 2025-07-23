@@ -30,5 +30,6 @@ class User(Base):
     rank = Column(Enum(RankEnum), default=RankEnum.beginner)
 
     notes = relationship("Note", back_populates="user", cascade="all, delete-orphan")
+    note_likes = relationship("NoteLike", cascade="all, delete-orphan")
     organizations = relationship("OrganizationUser", back_populates="user", cascade="all, delete-orphan")
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")

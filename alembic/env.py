@@ -27,6 +27,7 @@ import models.note
 import models.topic
 import models.channel
 import models.notifications
+import models.note_like
 
 target_metadata = Base.metadata
 
