@@ -4,6 +4,7 @@ from models.organization_invitations import OrganizationInvitation, StatusEnum
 from models.organization_user import OrganizationUser
 from database import db_dependency
 from models.organization_user import UserRoleEnum
+from models.organization_invitations import InvitedUserRoleEnum
 from models.user import User
 
 router = APIRouter(
@@ -12,7 +13,7 @@ router = APIRouter(
 )
 
 @router.post("/")
-async def invite_user(organization_id: int, email: str, role: UserRoleEnum, user: user_dependency, db: db_dependency):
+async def invite_user(organization_id: int, email: str, role: InvitedUserRoleEnum, user: user_dependency, db: db_dependency):
     org_user = db.query(OrganizationUser).filter_by(
         organization_id=organization_id,
         user_id=user["user_id"],
@@ -54,6 +55,32 @@ async def decline_invitation(invitation_id: int, user: user_dependency, db: db_d
     invitation.status = StatusEnum.declined
     db.commit()
     return {"message": "Invitation declined"}
+
+@router.post("/{invitation_id}/accept")
+async def accept_invitation(invitation_id: int, user: user_dependency, db: db_dependency):
+    invitation = db.query(OrganizationInvitation).filter(
+        OrganizationInvitation.invitation_id == invitation_id,
+        OrganizationInvitation.email == user["email"]
+    ).first()
+    if not invitation:
+        raise HTTPException(status_code=404, detail="Invitation not found")
+
+    if invitation.status != StatusEnum.pending:
+        raise HTTPException(status_code=400, detail="Invitation is not pending")
+
+    # Create organization user entry
+    org_user = OrganizationUser(
+        organization_id=invitation.organization_id,
+        user_id=user["user_id"],
+        role=invitation.role
+    )
+    db.add(org_user)
+
+    # Update invitation status
+    invitation.status = StatusEnum.accepted
+    db.commit()
+
+    return {"message": "Invitation accepted successfully"}
 
 @router.get("/my")
 async def my_invitations(user: user_dependency, db: db_dependency):
