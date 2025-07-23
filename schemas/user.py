@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from models.user import RankEnum
 
 class CreateUserRequest(BaseModel):
     username: str
@@ -16,6 +17,7 @@ class ReadUsersResponse(BaseModel):
     last_name: str
     score: int
     avatar_url: str | None = None
+    rank: RankEnum
 
 class UpdateUserRequest(BaseModel):
     username: str | None = None

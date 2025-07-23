@@ -1,5 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Form
+
+from models.organization import Organization
 from models.organization_user import OrganizationUser, UserRoleEnum
+from models.notifications import Notification
 from database import db_dependency
 from schemas.organization_user import ReadOrganizationUserResponse
 from services.auth_serivce import user_dependency
@@ -75,6 +78,10 @@ async def remove_user_from_organization(
     if not org_user or org_user.role != UserRoleEnum.owner:
         raise HTTPException(status_code=403, detail="No permission to remove users from this organization")
 
+    organization = db.query(Organization).filter_by(organization_id=organization_id).first()
+    if not organization:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+
     organization_user = db.query(OrganizationUser).filter_by(
         organization_id=organization_id,
         user_id=user_id
@@ -84,6 +91,11 @@ async def remove_user_from_organization(
 
     db.delete(organization_user)
     db.commit()
+
+    notification = Notification(user_id=user_id, message=f"You have been removed from organization {organization.organization_name}.", status="unread")
+    db.add(notification)
+    db.commit()
+
     return {"message": f"User {user_id} removed from organization {organization_id} successfully"}
 
 @router.put("/{organization_id}/{user_id}/role")
@@ -93,6 +105,7 @@ async def update_user_role(
     user_id: int,
     role: UserRoleEnum = Form(UserRoleEnum.user)
 ):
+
     organization_user = db.query(OrganizationUser).filter_by(
         organization_id=organization_id, user_id=user_id
     ).first()

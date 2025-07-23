@@ -17,7 +17,7 @@ async def invite_user(organization_id: int, email: str, role: InvitedUserRoleEnu
     org_user = db.query(OrganizationUser).filter_by(
         organization_id=organization_id,
         user_id=user["user_id"],
-        role=UserRoleEnum.owner
+        role=InvitedUserRoleEnum.owner
     ).first()
     if not org_user:
         raise HTTPException(status_code=403, detail="No permission to invite users to this organization")
@@ -99,3 +99,4 @@ async def sent_invitations(user: user_dependency, db: db_dependency):
     if not invitations:
         raise HTTPException(status_code=404, detail="No sent invitations found")
     return invitations
+

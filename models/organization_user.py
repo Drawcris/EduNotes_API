@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 import enum
 
 class UserRoleEnum(str, enum.Enum):
-    owner = "Owner"
+    owner = "owner"
     user = "user"
 
 
