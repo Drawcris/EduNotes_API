@@ -64,6 +64,9 @@ async def delete_organization(organization_id: int, db: db_dependency):
     organization = db.query(Organization).filter(Organization.organization_id == organization_id).first()
     if not organization:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
+
+    db.query(OrganizationUser).filter(OrganizationUser.organization_id == organization_id).delete()
+
     db.delete(organization)
     db.commit()
     return {"message": f"Organization {organization.organization_name} deleted successfully"}
