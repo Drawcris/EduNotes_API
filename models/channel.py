@@ -8,7 +8,7 @@ class Channel(Base):
 
     channel_id = Column(Integer, primary_key=True)
     channel_name = Column(String, nullable=False)
-    organization_id = Column(Integer, ForeignKey("organizations.organization_id"), nullable=False)
+    organization_id = Column(Integer, ForeignKey("organizations.organization_id", ondelete="CASCADE"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

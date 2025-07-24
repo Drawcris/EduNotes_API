@@ -60,18 +60,23 @@ async def create_organization(user: user_dependency, db: db_dependency, organiza
     return {"message": f"Organization {organization.organization_name} created successfully",}
 
 @router.delete("/{organization_id}")
-async def delete_organization(organization_id: int, db: db_dependency):
+async def delete_organization(user: user_dependency, organization_id: int, db: db_dependency):
     organization = db.query(Organization).filter(Organization.organization_id == organization_id).first()
     if not organization:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
 
-    db.query(OrganizationUser).filter(OrganizationUser.organization_id == organization_id).delete()
+    org_user = db.query(OrganizationUser).filter_by(
+        organization_id=organization_id,
+        user_id=user["user_id"],
+        role=UserRoleEnum.owner
+    ).first()
+    if not org_user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the owner can delete the organization")
 
     db.delete(organization)
     db.commit()
     return {"message": f"Organization {organization.organization_name} deleted successfully"}
 
-# TODO - Implement authorization checks for update and delete operations
 
 @router.put("/{organization_id}")
 async def update_organization(db: db_dependency, organization_id: int, organization: UpdateOrganizationRequest):

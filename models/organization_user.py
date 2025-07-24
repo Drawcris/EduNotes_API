@@ -12,7 +12,7 @@ class UserRoleEnum(str, enum.Enum):
 class OrganizationUser(Base):
     __tablename__ = "organization_users"
 
-    organization_id = Column(Integer, ForeignKey("organizations.organization_id"), primary_key=True)
+    organization_id = Column(Integer, ForeignKey("organizations.organization_id", ondelete="CASCADE"), primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id"), primary_key=True)
     role = Column(Enum(UserRoleEnum), default=UserRoleEnum.user)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

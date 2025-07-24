@@ -17,7 +17,7 @@ class OrganizationInvitation(Base):
     __tablename__ = "organization_invitations"
 
     invitation_id = Column(Integer, primary_key=True, index=True)
-    organization_id = Column(Integer, ForeignKey("organizations.organization_id"), nullable=False)
+    organization_id = Column(Integer, ForeignKey("organizations.organization_id", ondelete="CASCADE"), nullable=False)
     email = Column(String(255), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     role = Column(Enum(InvitedUserRoleEnum), default=InvitedUserRoleEnum.user, nullable=False)

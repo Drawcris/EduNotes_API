@@ -11,7 +11,7 @@ class Organization(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     invitations = relationship("OrganizationInvitation", back_populates="organization")
 
-    channels = relationship("Channel", back_populates="organization")
-    topics = relationship("Topic", back_populates="organization")
-    notes = relationship("Note", back_populates="organization")
-    users = relationship("OrganizationUser", back_populates="organization")
+    channels = relationship("Channel", back_populates="organization", passive_deletes=True)
+    topics = relationship("Topic", back_populates="organization", passive_deletes=True)
+    notes = relationship("Note", back_populates="organization", passive_deletes=True)
+    users = relationship("OrganizationUser", back_populates="organization", passive_deletes=True)

@@ -18,7 +18,7 @@ class Note(Base):
     topic_id = Column(Integer, ForeignKey("topics.topic_id"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     likes = Column(Integer, default=0)  # Number of likes
-    organization_id = Column(Integer, ForeignKey("organizations.organization_id"), nullable=False)
+    organization_id = Column(Integer, ForeignKey("organizations.organization_id", ondelete="CASCADE"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
