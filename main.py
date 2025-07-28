@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from routers import (auth, users, organizations, channels, topics, notes, organization_user, organization_invitations,
-                     ranking, notifications, deadlines)
+                     ranking, notifications, deadlines, ai_summary)
 
 app = FastAPI()
 app.include_router(auth.router)
@@ -15,6 +15,7 @@ app.include_router(organization_invitations.router)
 app.include_router(ranking.router)
 app.include_router(deadlines.router)
 app.include_router(notifications.router)
+app.include_router(ai_summary.router)
 
 app.mount("/media", StaticFiles(directory="media"), name="media")
 

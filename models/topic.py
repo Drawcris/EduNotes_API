@@ -16,3 +16,4 @@ class Topic(Base):
     channel = relationship("Channel", back_populates="topics")
     organization = relationship("Organization", back_populates="topics")
     notes = relationship("Note", back_populates="topic")
+    ai_summaries = relationship("AI_Summary", back_populates="topic")

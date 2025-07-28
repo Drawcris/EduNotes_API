@@ -29,6 +29,7 @@ import models.channel
 import models.notifications
 import models.note_like
 import models.deadline
+import models.ai_summary
 
 target_metadata = Base.metadata
 

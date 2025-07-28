@@ -9,7 +9,7 @@ router = APIRouter(
     tags=["channels"],
 )
 
-@router.get("/channels_in_orgazation")
+@router.get("/channels_in_organization")
 async def read_channels_in_organization(organization_id: int, db: db_dependency):
     channels = db.query(Channel).filter(Channel.organization_id == organization_id).all()
     if not channels:
