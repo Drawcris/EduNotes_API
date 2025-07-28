@@ -15,3 +15,4 @@ class Organization(Base):
     topics = relationship("Topic", back_populates="organization", passive_deletes=True)
     notes = relationship("Note", back_populates="organization", passive_deletes=True)
     users = relationship("OrganizationUser", back_populates="organization", passive_deletes=True)
+    deadlines = relationship("Deadline", back_populates="organization", passive_deletes=True)

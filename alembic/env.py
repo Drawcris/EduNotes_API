@@ -28,6 +28,7 @@ import models.topic
 import models.channel
 import models.notifications
 import models.note_like
+import models.deadline
 
 target_metadata = Base.metadata
 
