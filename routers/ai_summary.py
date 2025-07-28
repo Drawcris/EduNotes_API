@@ -45,6 +45,7 @@ async def update_ai_summary(summary_id: int, topic_id: int, db: db_dependency):
     db.refresh(summary)
 
     return {"message": "AI Summary updated successfully", "summary": summary}
+
 @router.delete("/{summary_id}")
 async def delete_ai_summary(summary_id: int, db: db_dependency):
     summary = db.query(AI_Summary).filter(AI_Summary.summary_id == summary_id).first()

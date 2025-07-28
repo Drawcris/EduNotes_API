@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from models.organization import Organization
 from database import db_dependency
 from schemas.organization import ReadOrganizationResponse, CreateOrganizationRequest, UpdateOrganizationRequest
+from schemas.responses import StandardResponse
 from datetime import datetime, UTC
 from services.auth_serivce import user_dependency
 from models.organization_user import OrganizationUser, UserRoleEnum
@@ -11,7 +12,7 @@ router = APIRouter(
     tags=["organizations"],
 )
 
-@router.get("/my")
+@router.get("/my", response_model=StandardResponse[list[ReadOrganizationResponse]])
 async def read_my_organizations(user: user_dependency, db: db_dependency):
     user_id = user["user_id"]
     organizations = (db.query(Organization).
@@ -19,25 +20,37 @@ async def read_my_organizations(user: user_dependency, db: db_dependency):
                      filter(OrganizationUser.user_id == user_id).all())
     if not organizations:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No organizations found for this user")
-    return [organization for organization in organizations]
+    return StandardResponse(
+        success=True,
+        message="Organizations retrieved successfully",
+        data=[organization for organization in organizations]
+    )
 
 # CRUD
 
-@router.get("/", response_model=list[ReadOrganizationResponse])
+@router.get("/", response_model=StandardResponse[list[ReadOrganizationResponse]])
 async def read_organizations(db: db_dependency):
     organizations = db.query(Organization).all()
     if not organizations:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No organizations found")
-    return [organization for organization in organizations]
+    return StandardResponse(
+        success=True,
+        message="Organizations retrieved successfully",
+        data=[organization for organization in organizations]
+    )
 
-@router.get("/{organization_id}", response_model=ReadOrganizationResponse)
+@router.get("/{organization_id}", response_model=StandardResponse[ReadOrganizationResponse])
 async def read_organization(organization_id: int, db: db_dependency):
     organization = db.query(Organization).filter(Organization.organization_id == organization_id).first()
     if not organization:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
-    return organization
+    return StandardResponse(
+        success=True,
+        message="Organization retrieved successfully",
+        data=organization
+    )
 
-@router.post("/")
+@router.post("/", response_model=StandardResponse[ReadOrganizationResponse])
 async def create_organization(user: user_dependency, db: db_dependency, organization: CreateOrganizationRequest):
     existing_organization = (db.query(Organization).
                              filter(Organization.organization_name == organization.organization_name).first())
@@ -57,9 +70,13 @@ async def create_organization(user: user_dependency, db: db_dependency, organiza
     )
     db.add(owner_user)
     db.commit()
-    return {"message": f"Organization {organization.organization_name} created successfully",}
+    return StandardResponse(
+        success=True,
+        message=f"Organization created successfully",
+        data=new_organization
+    )
 
-@router.delete("/{organization_id}")
+@router.delete("/{organization_id}", response_model=StandardResponse[ReadOrganizationResponse])
 async def delete_organization(user: user_dependency, organization_id: int, db: db_dependency):
     organization = db.query(Organization).filter(Organization.organization_id == organization_id).first()
     if not organization:
@@ -75,10 +92,13 @@ async def delete_organization(user: user_dependency, organization_id: int, db: d
 
     db.delete(organization)
     db.commit()
-    return {"message": f"Organization {organization.organization_name} deleted successfully"}
+    return StandardResponse(
+        success=True,
+        message=f"Organization {organization.organization_name} deleted successfully",
+        data=organization
+    )
 
-
-@router.put("/{organization_id}")
+@router.put("/{organization_id}", response_model=StandardResponse[ReadOrganizationResponse])
 async def update_organization(db: db_dependency, organization_id: int, organization: UpdateOrganizationRequest):
     existing_organization = db.query(Organization).filter(Organization.organization_id == organization_id).first()
     if not existing_organization:
@@ -90,5 +110,9 @@ async def update_organization(db: db_dependency, organization_id: int, organizat
 
     db.commit()
     db.refresh(existing_organization)
-    return {"message": f"Organization {existing_organization.organization_name} updated successfully"}
+    return StandardResponse(
+        success=True,
+        message=f"Organization {existing_organization.organization_name} updated successfully",
+        data=existing_organization
+    )
 
