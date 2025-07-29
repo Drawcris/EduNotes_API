@@ -3,6 +3,7 @@ from services.auth_serivce import user_dependency
 from database import db_dependency
 from models.notifications import Notification, NotificationStatusEnum
 from schemas.notifications import ReadNotifications
+from schemas.responses import StandardResponse
 
 
 router = APIRouter(
@@ -10,14 +11,18 @@ router = APIRouter(
     tags=["Notifications"],
 )
 
-@router.get("/my", response_model=list[ReadNotifications])
+@router.get("/my", response_model=StandardResponse[list[ReadNotifications]])
 async def get_my_notifications(user: user_dependency, db: db_dependency):
     notifications = db.query(Notification).filter(Notification.user_id == user["user_id"]).all()
     if not notifications:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No notifications found for this user")
-    return [notification for notification in notifications]
+    return StandardResponse(
+        success=True,
+        message="Notifications retrieved successfully",
+        data=notifications
+    )
 
-@router.put('/{notification_id}/read', response_model=ReadNotifications)
+@router.put('/{notification_id}/read', response_model=StandardResponse[ReadNotifications])
 async def mark_notification_as_read(notification_id: int, user: user_dependency, db: db_dependency):
     notification = db.query(Notification).filter(
         Notification.notification_id == notification_id,
@@ -30,9 +35,13 @@ async def mark_notification_as_read(notification_id: int, user: user_dependency,
     notification.status = NotificationStatusEnum.read
     db.commit()
     db.refresh(notification)
-    return notification
+    return StandardResponse(
+        success=True,
+        message="Notification marked as read successfully",
+        data=notification
+    )
 
-@router.delete("/{notification_id}")
+@router.delete("/{notification_id}", response_model=StandardResponse[ReadNotifications])
 async def delete_my_notification(notification_id: int, user: user_dependency, db: db_dependency):
     notification = db.query(Notification).filter(
         Notification.notification_id == notification_id,
@@ -44,9 +53,13 @@ async def delete_my_notification(notification_id: int, user: user_dependency, db
 
     db.delete(notification)
     db.commit()
-    return {"message": "Notification deleted successfully"}
+    return StandardResponse(
+        success=True,
+        message="Notification deleted successfully",
+        data=notification
+    )
 
-@router.delete("/")
+@router.delete("/", response_model=StandardResponse[list[ReadNotifications]])
 async def delete_all_my_notifications(user: user_dependency, db: db_dependency):
     notifications = db.query(Notification).filter(Notification.user_id == user["user_id"]).all()
     if not notifications:
@@ -55,21 +68,33 @@ async def delete_all_my_notifications(user: user_dependency, db: db_dependency):
     for notification in notifications:
         db.delete(notification)
     db.commit()
-    return {"message": "All notifications deleted successfully"}
+    return StandardResponse(
+        success=True,
+        message="All notifications deleted successfully",
+        data=notifications
+    )
 
 
 # CRUD
-@router.get("/", response_model=list[ReadNotifications])
+@router.get("/", response_model=StandardResponse[list[ReadNotifications]])
 async def get_notifications(db: db_dependency):
     notifications = db.query(Notification).all()
     if not notifications:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No notifications found")
-    return [notification for notification in notifications]
+    return StandardResponse(
+        success=True,
+        message="Notifications retrieved successfully",
+        data=notifications
+    )
 
-@router.get("/{notification_id}", response_model=ReadNotifications)
+@router.get("/{notification_id}", response_model=StandardResponse[ReadNotifications])
 async def get_notification(notification_id: int, db: db_dependency):
     notification = db.query(Notification).filter(Notification.notification_id == notification_id).first()
     if not notification:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found")
-    return notification
+    return StandardResponse(
+        success=True,
+        message="Notification retrieved successfully",
+        data=notification
+    )
 

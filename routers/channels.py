@@ -20,7 +20,7 @@ async def read_channels_in_organization(organization_id: int, db: db_dependency)
     return StandardResponse(
         success=True,
         message="Your channels in this organization retrieved successfully",
-        data=[channel for channel in channels]
+        data=channels
     )
 
 
@@ -34,7 +34,7 @@ async def read_channels(db: db_dependency):
     return StandardResponse(
         success=True,
         message="Channels retrieved successfully",
-        data=[channel for channel in channels]
+        data=channels
     )
 
 @router.get("/{channel_id}", response_model=StandardResponse[ReadChannelResponse])

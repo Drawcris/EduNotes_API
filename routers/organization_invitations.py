@@ -4,6 +4,8 @@ from models.organization_invitations import OrganizationInvitation, StatusEnum
 from models.organization_user import OrganizationUser
 from database import db_dependency
 from models.organization_user import UserRoleEnum
+from schemas.responses import StandardResponse
+from schemas.organization_invitation import ReadOrganizationInvitation
 from models.organization_invitations import InvitedUserRoleEnum
 from models.user import User
 
@@ -12,12 +14,12 @@ router = APIRouter(
     tags=["Organization Invitations"],
 )
 
-@router.post("/")
+@router.post("/", response_model=StandardResponse[ReadOrganizationInvitation])
 async def invite_user(organization_id: int, email: str, role: InvitedUserRoleEnum, user: user_dependency, db: db_dependency):
     org_user = db.query(OrganizationUser).filter_by(
         organization_id=organization_id,
         user_id=user["user_id"],
-        role=InvitedUserRoleEnum.owner
+        role=UserRoleEnum.owner
     ).first()
     if not org_user:
         raise HTTPException(status_code=403, detail="No permission to invite users to this organization")
@@ -42,9 +44,13 @@ async def invite_user(organization_id: int, email: str, role: InvitedUserRoleEnu
     db.add(invitation)
     db.commit()
     db.refresh(invitation)
-    return {"message": "Invitation sent successfully"}
+    return StandardResponse(
+        success=True,
+        message="Invitation sent successfully",
+        data=invitation
+    )
 
-@router.post("/{invitation_id}/decline")
+@router.post("/{invitation_id}/decline", response_model=StandardResponse)
 async def decline_invitation(invitation_id: int, user: user_dependency, db: db_dependency):
     invitation = db.query(OrganizationInvitation).filter(
         OrganizationInvitation.invitation_id == invitation_id,
@@ -54,9 +60,13 @@ async def decline_invitation(invitation_id: int, user: user_dependency, db: db_d
         raise HTTPException(status_code=404, detail="Invitation not found")
     invitation.status = StatusEnum.declined
     db.commit()
-    return {"message": "Invitation declined"}
+    return StandardResponse(
+        success=True,
+        message="Invitation declined successfully",
+        data=None
+    )
 
-@router.post("/{invitation_id}/accept")
+@router.post("/{invitation_id}/accept", response_model=StandardResponse)
 async def accept_invitation(invitation_id: int, user: user_dependency, db: db_dependency):
     invitation = db.query(OrganizationInvitation).filter(
         OrganizationInvitation.invitation_id == invitation_id,
@@ -80,23 +90,34 @@ async def accept_invitation(invitation_id: int, user: user_dependency, db: db_de
     invitation.status = StatusEnum.accepted
     db.commit()
 
-    return {"message": "Invitation accepted successfully"}
+    return StandardResponse(
+        success=True,
+        message="Invitation accepted successfully",
+        data=None
+    )
 
-@router.get("/my")
+@router.get("/my", response_model=StandardResponse[list[ReadOrganizationInvitation]])
 async def my_invitations(user: user_dependency, db: db_dependency):
     invitations = db.query(OrganizationInvitation).filter(
         OrganizationInvitation.email == user["email"]
     ).all()
     if not invitations:
         raise HTTPException(status_code=404, detail="No invitations found")
-    return invitations
+    return StandardResponse(
+        success=True,
+        message="Invitations retrieved successfully",
+        data=invitations
+    )
 
-@router.get("/sent")
+@router.get("/sent", response_model=StandardResponse[list[ReadOrganizationInvitation]])
 async def sent_invitations(user: user_dependency, db: db_dependency):
     invitations = db.query(OrganizationInvitation).filter(
         OrganizationInvitation.invited_by_user_id == user["user_id"]
     ).all()
     if not invitations:
         raise HTTPException(status_code=404, detail="No sent invitations found")
-    return invitations
-
+    return StandardResponse(
+        success=True,
+        message="Sent invitations retrieved successfully",
+        data=invitations
+    )

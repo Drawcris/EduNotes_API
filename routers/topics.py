@@ -20,7 +20,7 @@ async def read_topics_in_channel(channel_id: int, db: db_dependency):
     return StandardResponse(
         success=True,
         message="Topics retrieved successfully",
-        data=[topic for topic in topics]
+        data=topics
     )
 
 # CRUD
@@ -33,7 +33,7 @@ async def read_topics(db: db_dependency):
     return StandardResponse(
         success=True,
         message="Topics retrieved successfully",
-        data=[topic for topic in topics]
+        data=topics
     )
 
 @router.get("/{topic_id}", response_model=StandardResponse[ReadTopicResponse])

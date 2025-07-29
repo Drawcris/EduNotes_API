@@ -23,7 +23,7 @@ async def read_my_organizations(user: user_dependency, db: db_dependency):
     return StandardResponse(
         success=True,
         message="Organizations retrieved successfully",
-        data=[organization for organization in organizations]
+        data=organizations
     )
 
 # CRUD
@@ -36,7 +36,7 @@ async def read_organizations(db: db_dependency):
     return StandardResponse(
         success=True,
         message="Organizations retrieved successfully",
-        data=[organization for organization in organizations]
+        data=organizations
     )
 
 @router.get("/{organization_id}", response_model=StandardResponse[ReadOrganizationResponse])

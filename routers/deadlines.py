@@ -25,7 +25,7 @@ async def get_my_deadlines(user: user_dependency, db: db_dependency):
     return StandardResponse(
         success=True,
         message="Deadlines retrieved successfully",
-        data=[deadline for deadline in deadlines]
+        data=deadlines
     )
 
 #CRUD
@@ -37,7 +37,7 @@ async def read_deadlines(db: db_dependency):
     return StandardResponse(
         success=True,
         message="Deadlines retrieved successfully",
-        data=[deadline for deadline in deadlines]
+        data=deadlines
     )
 
 @router.get("/{deadline_id}", response_model=StandardResponse[ReadDeadline])

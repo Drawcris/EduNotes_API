@@ -5,6 +5,22 @@ from routers import (auth, users, organizations, channels, topics, notes, organi
                      ranking, notifications, deadlines, ai_summary)
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"]
+)
+
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(organizations.router)
@@ -20,16 +36,6 @@ app.include_router(ai_summary.router)
 
 app.mount("/media", StaticFiles(directory="media"), name="media")
 
-origins = [
-    "http://localhost:3000",
-]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/")
 def read_root():
