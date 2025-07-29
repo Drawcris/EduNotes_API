@@ -25,3 +25,4 @@ class Note(Base):
     topic = relationship("Topic", back_populates="notes")
     user = relationship("User", back_populates="notes")
     organization = relationship("Organization", back_populates="notes")
+    note_likes = relationship("NoteLike", back_populates="note", cascade="all, delete-orphan")

@@ -4,6 +4,7 @@ from models.organization_user import OrganizationUser
 from models.user import User
 from database import db_dependency
 from services.auth_serivce import user_dependency
+from schemas.responses import StandardResponse
 from schemas.deadline import ReadDeadline, CreateDeadline, UpdateDeadline
 
 router = APIRouter(
@@ -12,7 +13,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
-@router.get("/my_deadlines", response_model=list[ReadDeadline])
+@router.get("/my_deadlines", response_model=StandardResponse[list[ReadDeadline]])
 async def get_my_deadlines(user: user_dependency, db: db_dependency):
     org_user = db.query(OrganizationUser).filter(OrganizationUser.user_id == user["user_id"]).all()
     if not org_user:
@@ -21,24 +22,36 @@ async def get_my_deadlines(user: user_dependency, db: db_dependency):
     deadlines = db.query(Deadline).filter(Deadline.organization_id.in_(org_ids)).all()
     if not deadlines:
         raise HTTPException(status_code=404, detail="User has no deadlines in their organization")
-    return [deadline for deadline in deadlines]
+    return StandardResponse(
+        success=True,
+        message="Deadlines retrieved successfully",
+        data=[deadline for deadline in deadlines]
+    )
 
 #CRUD
-@router.get("/", response_model=list[ReadDeadline])
+@router.get("/", response_model=StandardResponse[list[ReadDeadline]])
 async def read_deadlines(db: db_dependency):
     deadlines = db.query(Deadline).all()
     if not deadlines:
         raise HTTPException(status_code=404, detail="No deadlines found")
-    return [deadline for deadline in deadlines]
+    return StandardResponse(
+        success=True,
+        message="Deadlines retrieved successfully",
+        data=[deadline for deadline in deadlines]
+    )
 
-@router.get("/{deadline_id}", response_model=ReadDeadline)
+@router.get("/{deadline_id}", response_model=StandardResponse[ReadDeadline])
 async def read_deadline(deadline_id: int, db: db_dependency):
     deadline = db.query(Deadline).filter(Deadline.deadline_id == deadline_id).first()
     if not deadline:
         raise HTTPException(status_code=404, detail="Deadline not found")
-    return deadline
+    return StandardResponse(
+        success=True,
+        message="Deadline retrieved successfully",
+        data=deadline
+    )
 
-@router.post("/")
+@router.post("/", response_model=StandardResponse[ReadDeadline])
 async def create_deadline(user: user_dependency,db: db_dependency, deadline: CreateDeadline = Form(...)):
     new_deadline = Deadline(
         event_type=deadline.event_type,
@@ -51,9 +64,13 @@ async def create_deadline(user: user_dependency,db: db_dependency, deadline: Cre
     db.add(new_deadline)
     db.commit()
     db.refresh(new_deadline)
-    return new_deadline
+    return StandardResponse(
+        success=True,
+        message="Deadline created successfully",
+        data=new_deadline
+    )
 
-@router.put("/{deadline_id}")
+@router.put("/{deadline_id}", response_model=StandardResponse[ReadDeadline])
 async def update_deadline(deadline_id: int, db: db_dependency, deadline: UpdateDeadline = Form(...)):
     existing_deadline = db.query(Deadline).filter(Deadline.deadline_id == deadline_id).first()
     if not existing_deadline:
@@ -66,9 +83,13 @@ async def update_deadline(deadline_id: int, db: db_dependency, deadline: UpdateD
 
     db.commit()
     db.refresh(existing_deadline)
-    return existing_deadline
+    return StandardResponse(
+        success=True,
+        message="Deadline updated successfully",
+        data=existing_deadline
+    )
 
-@router.delete("/{deadline_id}")
+@router.delete("/{deadline_id}", response_model=StandardResponse)
 async def delete_deadline(deadline_id: int, db: db_dependency):
     deadline = db.query(Deadline).filter(Deadline.deadline_id == deadline_id).first()
     if not deadline:
@@ -76,4 +97,7 @@ async def delete_deadline(deadline_id: int, db: db_dependency):
 
     db.delete(deadline)
     db.commit()
-    return {"detail": "Deadline deleted successfully"}
+    return StandardResponse(
+        success=True,
+        message="Deadline deleted successfully"
+    )

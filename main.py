@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from routers import (auth, users, organizations, channels, topics, notes, organization_user, organization_invitations,
                      ranking, notifications, deadlines, ai_summary)
@@ -19,6 +20,16 @@ app.include_router(ai_summary.router)
 
 app.mount("/media", StaticFiles(directory="media"), name="media")
 
+origins = [
+    "http://localhost:3000",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
