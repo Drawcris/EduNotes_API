@@ -49,9 +49,6 @@ async def read_topic(db: db_dependency, topic_id: int):
 
 @router.post("/", response_model=StandardResponse[ReadTopicResponse])
 async def create_topic(topic: CreateTopicRequest, db: db_dependency):
-    existing_topic = db.query(Topic).filter(Topic.topic_name == topic.topic_name).first()
-    if existing_topic:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Topic with this name already exists")
     existing_organization = db.query(Organization).filter(Organization.organization_id == topic.organization_id).first()
     if not existing_organization:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")

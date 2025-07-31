@@ -50,9 +50,6 @@ async def read_channel(channel_id: int, db: db_dependency):
 
 @router.post("/", response_model=StandardResponse[ReadChannelResponse])
 async def create_channel(channel: CreateChannelRequest, db: db_dependency):
-    existing_channel = db.query(Channel).filter(Channel.channel_name == channel.channel_name).first()
-    if existing_channel:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Channel with this name already exists")
     chosen_organization = channel.organization_id
     if not db.query(Organization).filter(Organization.organization_id == chosen_organization).first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Organization not found")
