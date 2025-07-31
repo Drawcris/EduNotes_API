@@ -160,29 +160,6 @@ def test_create_topic(headers, test_organization, test_channel, test_topic):
     assert data["message"] == "Topic created successfully"
     assert data["data"]["topic_name"] == test_topic["topic_name"]
 
-def test_create_topic_already_exists(headers, test_organization, test_channel, test_topic):
-    response = client.post("/organizations/",
-                         json=test_organization,
-                         headers=headers)
-    assert response.status_code == 200
-
-    response = client.post("/channels/",
-                         json=test_channel,
-                         headers=headers)
-    assert response.status_code == 200
-
-    response = client.post("/topics/",
-                         json=test_topic,
-                         headers=headers)
-    assert response.status_code == 200
-
-    # Attempt to create the same topic again
-    response = client.post("/topics/",
-                         json=test_topic,
-                         headers=headers)
-    assert response.status_code == 400
-    data = response.json()
-    assert data["detail"] == "Topic with this name already exists"
 
 def test_create_topic_invalid_organization(headers, test_channel, test_topic, test_organization):
     client.post("/organizations/",

@@ -39,74 +39,32 @@ app.mount("/media", StaticFiles(directory="media"), name="media")
 
 @app.get("/")
 def read_root():
-    routes = {
-        "auth": {
-            "description": "Authentication routers",
-            "methods": ["POST"],
-            "endpoints": [
-                "/auth/login",
-                "/auth/register"
-            ]
+    return {
+        "name": "EduNotes API",
+        "version": "1.0.0",
+        "description": "API for managing study notes, organizations and collaborative learning with AI features.",
+        "endpoints": {
+            "auth": {
+                "login": "/auth/login",
+                "register": "/auth/register"
+            },
+            "users": "/users",
+            "organizations": "/organizations",
+            "organization_user": "/organization_user",
+            "organization_invitations": "/organization_invitations",
+            "channels": "/channels",
+            "topics": "/topics",
+            "notes": "/notes",
+            "features": {
+                "ranking": "/ranking",
+                "deadlines": "/deadlines",
+                "notifications": "/notifications",
+                "ai_summary": "/ai_summary"
+            }
         },
-        "users": {
-            "description": "User management routers",
-            "methods": ["GET", "DELETE", "PUT"],
-            "endpoints": [
-                "/users/",
-                "/users/{user_id}"
-                "/users/{user_id}/avatar",
-                "/users/{user_id}/increase_score",
-                "/users/{user_id}/decrease_score"
-            ]
-        },
-        "organizations": {
-            "description": "Organization management routers",
-            "methods": ["GET", "POST", "DELETE", "PUT"],
-            "endpoints": [
-                "/organizations/",
-                "/organizations/{organization_id}"
-            ]
-        },
-        "channels": {
-            "description": "Channel management routers",
-            "methods": ["GET", "POST", "DELETE", "PUT"],
-            "endpoints": [
-                "/channels/",
-                "/channels/{channel_id}",
-                "/channels/channels_in_organization"
-            ]
-        },
-        "topics": {
-            "description": "Topic management routers",
-            "methods": ["GET", "POST", "DELETE", "PUT"],
-            "endpoints": [
-                "/topics/",
-                "/topics/{topic_id}",
-                "/topics/topics_in_channel"
-            ]
-        },
-        "notes": {
-            "description": "Note management routers",
-            "methods": ["GET", "POST", "DELETE"],
-            "endpoints": [
-                "/notes/",
-                "/notes/{note_id}",
-                "/notes/notes_in_topic"
-            ]
-        },
-        "organization_user": {
-            "description": "Organization user management routers",
-            "methods": ["POST", "DELETE", "GET", "PUT"],
-            "endpoints": [
-                "/organization_user/",
-                "/organization_user/me",
-                "/organization_user/{organization_user_id}",
-                "/organization_user/{organization_user_id}/role",
-                "/organization_user/invite",
-                "/organization_user/RemoveUserFromOrganization",
-            ]
-        }
-
+        "documentation": "/docs",
+        "openapi": "/openapi.json",
+        "media_files": "/media",
+        "status": "active",
     }
-    return routes
 
