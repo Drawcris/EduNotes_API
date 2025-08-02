@@ -35,7 +35,6 @@ def test_read_users_empty():
     data = response.json()
     assert data["detail"] == "Users not found"
 
-
 def test_read_user(test_user):
     client.post("/auth/register/",
         json=test_user)

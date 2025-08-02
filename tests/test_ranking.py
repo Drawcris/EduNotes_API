@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client
+from .conftest import setup_database, teardown_database, client, headers
 
 
 @pytest.fixture(autouse=True)
@@ -7,10 +7,6 @@ def setup():
     setup_database()
     yield
     teardown_database()
-
-@pytest.fixture
-def headers():
-    return {"Authorization": "Bearer test-token"}
 
 @pytest.fixture
 def test_user():

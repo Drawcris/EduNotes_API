@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client
+from .conftest import setup_database, teardown_database, client, test_channel, test_organization
 
 @pytest.fixture(autouse=True)
 def setup_and_teardown():
@@ -7,18 +7,6 @@ def setup_and_teardown():
     yield
     teardown_database()
 
-@pytest.fixture
-def test_organization():
-    return {
-        "organization_name": "Test Organization",
-    }
-
-@pytest.fixture
-def test_channel():
-    return {
-        "channel_name": "Test Channel",
-        "organization_id": 1,
-    }
 
 def test_read_channels(test_channel, test_organization):
     client.post(

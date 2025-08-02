@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client
+from .conftest import setup_database, teardown_database, client, headers, test_organization, test_channel, test_topic
 
 
 @pytest.fixture(autouse=True)
@@ -7,13 +7,6 @@ def setup():
     setup_database()
     yield
     teardown_database()
-
-
-@pytest.fixture
-def test_organization():
-    return {
-        "organization_name": "Test Organization"
-    }
 
 @pytest.fixture
 def test_user():
@@ -25,25 +18,6 @@ def test_user():
         "last_name": "User",
     }
 
-@pytest.fixture
-def test_channel(test_organization):
-    return {
-        "channel_name": "Test Channel",
-        "organization_id": 1
-    }
-
-
-@pytest.fixture
-def test_topic(test_channel):
-    return {
-        "topic_name": "Test Topic",
-        "channel_id": 1,
-        "organization_id": 1
-    }
-
-@pytest.fixture
-def headers():
-    return {"Authorization": "Bearer test-token"}
 
 def test_get_my_notifications(headers, test_user, test_organization):
     response = client.post("/auth/register", json=test_user)

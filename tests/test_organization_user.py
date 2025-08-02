@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client
+from .conftest import setup_database, teardown_database, client, test_organization
 from models.organization_user import UserRoleEnum
 
 @pytest.fixture(autouse=True)
@@ -7,12 +7,6 @@ def setup_and_teardown():
     setup_database()
     yield
     teardown_database()
-
-@pytest.fixture
-def test_organization():
-    return {
-        "organization_name": "Test Organization",
-    }
 
 @pytest.fixture
 def test_user():

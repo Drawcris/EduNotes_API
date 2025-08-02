@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client
+from .conftest import setup_database, teardown_database, client, test_organization
 from fastapi.testclient import TestClient
 from models.organization_user import UserRoleEnum
 from models.organization_invitations import InvitedUserRoleEnum
@@ -10,12 +10,6 @@ def setup_and_teardown():
     setup_database()
     yield
     teardown_database()
-
-@pytest.fixture
-def test_organization():
-    return {
-        "organization_name": "Test Organization",
-    }
 
 @pytest.fixture
 def test_user():

@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client
+from .conftest import setup_database, teardown_database, client, headers, test_organization, test_channel, test_topic
 
 
 @pytest.fixture(autouse=True)
@@ -10,12 +10,6 @@ def setup():
 
 
 @pytest.fixture
-def test_organization():
-    return {
-        "organization_name": "Test Organization"
-    }
-
-@pytest.fixture
 def test_user():
     return {
         "username": "testuser",
@@ -24,26 +18,6 @@ def test_user():
         "first_name": "Test",
         "last_name": "User",
     }
-
-@pytest.fixture
-def test_channel(test_organization):
-    return {
-        "channel_name": "Test Channel",
-        "organization_id": 1
-    }
-
-
-@pytest.fixture
-def test_topic(test_channel):
-    return {
-        "topic_name": "Test Topic",
-        "channel_id": 1,
-        "organization_id": 1
-    }
-
-@pytest.fixture
-def headers():
-    return {"Authorization": "Bearer test-token"}
 
 @pytest.fixture
 def test_note_text(test_topic):

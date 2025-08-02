@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client
+from .conftest import setup_database, teardown_database, client, headers, test_organization, test_channel, test_topic
 
 
 @pytest.fixture(autouse=True)
@@ -8,33 +8,6 @@ def setup():
     yield
     teardown_database()
 
-
-@pytest.fixture
-def test_organization():
-    return {
-        "organization_name": "Test Organization"
-    }
-
-
-@pytest.fixture
-def test_channel(test_organization):
-    return {
-        "channel_name": "Test Channel",
-        "organization_id": 1
-    }
-
-
-@pytest.fixture
-def test_topic(test_channel):
-    return {
-        "topic_name": "Test Topic",
-        "channel_id": 1,
-        "organization_id": 1
-    }
-
-@pytest.fixture
-def headers():
-    return {"Authorization": "Bearer test-token"}
 
 def test_read_topics_in_channel(headers, test_organization, test_channel, test_topic):
     response = client.post("/organizations/",
@@ -159,7 +132,6 @@ def test_create_topic(headers, test_organization, test_channel, test_topic):
     assert data["success"] is True
     assert data["message"] == "Topic created successfully"
     assert data["data"]["topic_name"] == test_topic["topic_name"]
-
 
 def test_create_topic_invalid_organization(headers, test_channel, test_topic, test_organization):
     client.post("/organizations/",

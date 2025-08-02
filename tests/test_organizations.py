@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client
+from .conftest import setup_database, teardown_database, client, test_organization
 from fastapi.testclient import TestClient
 from routers.organizations import router as organizations_router
 
@@ -64,8 +64,6 @@ def test_create_existing_organization(test_organization):
         data = response.json()
         assert data["detail"] == "Organization with this name already exists"
 
-
-
 def test_read_organizations(test_organization):
         client.post(
             "/organizations/",
@@ -104,7 +102,6 @@ def test_read_organization_not_found():
         assert response.status_code == 404
         data = response.json()
         assert data["detail"] == "Organization not found"
-
 
 def test_delete_organization(test_organization):
         client.post(
