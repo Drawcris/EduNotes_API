@@ -9,12 +9,6 @@ def setup_and_teardown():
     yield
     teardown_database()
 
-@pytest.fixture
-def test_organization():
-    return {
-        "organization_name": "Test Organization",
-    }
-
 def test_create_organization(test_organization):
         response = client.post(
             "/organizations/",

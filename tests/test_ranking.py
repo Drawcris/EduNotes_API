@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client, headers
+from .conftest import setup_database, teardown_database, client, headers, test_user
 
 
 @pytest.fixture(autouse=True)
@@ -7,16 +7,6 @@ def setup():
     setup_database()
     yield
     teardown_database()
-
-@pytest.fixture
-def test_user():
-    return {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "testpassword",
-        "first_name": "Test",
-        "last_name": "User",
-    }
 
 def test_get_my_score(headers, test_user):
     response = client.post("/auth/register", json=test_user)

@@ -1,5 +1,6 @@
 import pytest
-from .conftest import setup_database, teardown_database, client, headers, test_organization, test_channel, test_topic
+from .conftest import (setup_database, teardown_database, client,
+                       headers, test_organization, test_channel, test_topic, test_user)
 
 
 @pytest.fixture(autouse=True)
@@ -7,17 +8,6 @@ def setup():
     setup_database()
     yield
     teardown_database()
-
-
-@pytest.fixture
-def test_user():
-    return {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "testpassword",
-        "first_name": "Test",
-        "last_name": "User",
-    }
 
 @pytest.fixture
 def test_note_text(test_topic):

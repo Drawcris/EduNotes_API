@@ -41,6 +41,8 @@ def setup_database():
 def teardown_database():
     Base.metadata.drop_all(bind=engine)
 
+# Test fixtures
+
 @pytest.fixture
 def test_organization():
     return {
@@ -67,3 +69,13 @@ def test_topic(test_channel):
 @pytest.fixture
 def headers():
     return {"Authorization": "Bearer test-token"}
+
+@pytest.fixture
+def test_user():
+    return {
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "testpassword",
+        "first_name": "Test",
+        "last_name": "User",
+    }

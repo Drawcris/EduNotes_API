@@ -1,5 +1,5 @@
 import pytest
-from .conftest import setup_database, teardown_database, client
+from .conftest import setup_database, teardown_database, client, test_user
 
 
 @pytest.fixture(autouse=True)
@@ -7,16 +7,6 @@ def setup_and_teardown():
     setup_database()
     yield
     teardown_database()
-
-@pytest.fixture
-def test_user():
-    return {
-        "username": "testuser",
-        "email": "test@test.pl",
-        "password": "testpassword",
-        "first_name": "Test",
-        "last_name": "User",
-    }
 
 def test_read_users(test_user):
     client.post("/auth/register/",
