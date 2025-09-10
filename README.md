@@ -24,8 +24,9 @@ EduNotes is a collaborative note-taking platform designed to streamline educatio
 This project was a 👥 collaborative effort by a team of two, with 📋 task management and planning handled through 📅 ClickUp.
 
 ## 🚦 Getting Started
+📂 [Project Frontend Repository](https://github.com/AleeN1337/EduNotes-2.0)
 
-1. 📥 Clone the repository to your local machine.
+1. 📥 Clone the repositories to your local machine.
 2. 🐳 Ensure Docker is installed and run the containers for the database, frontend, and backend.
 3. ⚙️ Configure necessary environment variables for 🔑 API keys and 📊 database settings.
 4. ▶️ Launch the application and access it via the frontend URL.
